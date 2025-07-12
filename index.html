@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Grid Failure Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <nav class="navbar navbar-expand-sm bg-light navbar-light dark:bg-gray-800 dark:border-gray-700 shadow-md">
+        <ul class="navbar-nav flex-grow justify-center items-center relative">
+            <li class="nav-item active">
+                <a class="nav-link text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400" href="dashboard.html" target="_blank">Dashboard</a>
+            </li>
+            <li class="absolute left-1/2 transform -translate-x-1/2">
+                <a id="projectTitle" class="text-xl font-bold text-blue-700 dark:text-blue-300 hover:underline cursor-pointer">Electric Grid Failure Prediction</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400" href="#">Settings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400" href="#">About</a>
+            </li>
+            <li class="nav-item ml-auto">
+                <button id="themeToggle" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md text-sm">
+                    Toggle Dark Mode
+                </button>
+            </li>
+        </ul>
+    </nav>
+    <section id="settingsSection" class="hidden px-8 py-6">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Settings</h1>
+        <div class="grid grid-cols-2 gap-8">
+            <div class="bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow space-y-4">
+                <h2 class="text-lg font-semibold text-white mb-4">Simulation Parameters</h2>
+                <label class="block text-sm font-medium text-gray-300">Number of Nodes/Lines</label>
+                <input id="nodesInput" type="number" min="1" max="100" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white" placeholder="9">
+                <label class="block text-sm font-medium text-gray-300">Grid Complexity</label>
+                <select id="gridComplexity" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white">
+                    <option>Simple Radial</option>
+                    <option>Mesh</option>
+                    <option>Ring</option>
+                </select>
+                <label class="block text-sm font-medium text-gray-300">Component Types</label>
+                <select id="componentTypes" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white">
+                    <option>Balanced</option>
+                    <option>Unbalanced</option>
+                </select>
+                <label class="block text-sm font-medium text-gray-300">Noise Level</label>
+                <input id="noiseLevel" type="range" min="0" max="100" class="w-full mb-2">
+                <label class="block text-sm font-medium text-gray-300">Baseline Values</label>
+                <input id="baselineValues" type="text" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white" placeholder="e.g. 100V, 60Hz">
+                <label class="block text-sm font-medium text-gray-300">Failure Frequency</label>
+                <select id="failureFrequency" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white">
+                    <option>Rare</option>
+                    <option>Occasional</option>
+                    <option>Frequent</option>
+                </select>
+                <label class="block text-sm font-medium text-gray-300">Time Scale</label>
+                <select id="timeScale" class="w-full rounded px-2 py-1 bg-gray-700 text-white">
+                    <option>Update every 1 second</option>
+                    <option>Update every 5 seconds</option>
+                    <option>Update every 10 seconds</option>
+                </select>
+            </div>
+            <div class="bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow space-y-4">
+                <h2 class="text-lg font-semibold text-white mb-4">Prediction Logic Configuration</h2>
+                <div class="flex space-x-2 mb-2">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-300">Voltage Thresholds</label>
+                        <input id="voltageMin" type="text" class="w-full rounded px-2 py-1 mb-1 bg-gray-700 text-white" placeholder="Min">
+                        <input id="voltageMax" type="text" class="w-full rounded px-2 py-1 bg-gray-700 text-white" placeholder="Max">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-300">Current Thresholds</label>
+                        <input id="currentMax" type="text" class="w-full rounded px-2 py-1 bg-gray-700 text-white" placeholder="Max">
+                    </div>
+                </div>
+                <label class="block text-sm font-medium text-gray-300">Temperature Thresholds</label>
+                <input id="temperatureMax" type="text" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white" placeholder="Max">
+                <label class="block text-sm font-medium text-gray-300">Consecutive Readings (N)</label>
+                <input id="consecutiveReadings" type="range" min="1" max="10" class="w-full mb-2">
+                <label class="block text-sm font-medium text-gray-300">Voltage Rate Limit</label>
+                <input id="voltageRateLimit" type="text" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white" placeholder="Max change/i">
+                <label class="block text-sm font-medium text-gray-300">Current Rate Limit</label>
+                <input id="currentRateLimit" type="text" class="w-full rounded px-2 py-1 mb-2 bg-gray-700 text-white" placeholder="Max change/i">
+                <label class="block text-sm font-medium text-gray-300">Pattern Recognition Rules</label>
+                <div class="mb-2">
+                    <label class="inline-flex items-center text-gray-300"><input id="ruleCritical" type="checkbox" class="mr-2">Voltage Drop + Current Spike = Critical</label><br>
+                    <label class="inline-flex items-center text-gray-300"><input id="ruleWarning" type="checkbox" class="mr-2">Temperature Spike + Load Surge = Warning</label><br>
+                    <label class="inline-flex items-center text-gray-300"><input id="ruleCustom1" type="checkbox" class="mr-2">Custom Rule 1</label>
+                </div>
+                <label class="block text-sm font-medium text-gray-300">Prediction Sensitivity</label>
+                <input id="predictionSensitivity" type="range" min="0" max="100" class="w-full">
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-8 mt-8">
+            <div class="bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow space-y-4">
+                <h2 class="text-lg font-semibold text-white mb-4">Display Options</h2>
+                <label class="block text-sm font-medium text-gray-300">Theme Selector</label>
+                <select id="themeSelector" class="w-full rounded px-2 py-1 bg-gray-700 text-white">
+                    <option>Light</option>
+                    <option>Dark</option>
+                    <option>System</option>
+                </select>
+            </div>
+            <div class="bg-gray-800 bg-opacity-90 rounded-lg p-6 shadow space-y-4">
+                <h2 class="text-lg font-semibold text-white mb-4">Data Management</h2>
+                <button id="saveConfigBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors mb-2">Save Configuration</button>
+                <button id="loadConfigBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors">Load Configuration</button>
+                <div id="configMsg" class="hidden mt-4 text-green-400 font-semibold text-center">Configuration saved!</div>
+            </div>
+        </div>
+    </section>
+    <section id="aboutSection" class="hidden px-8 py-6">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">About Our Project: Electric Grid Failure Prediction</h1>
+        <p class="mb-4 text-gray-700 dark:text-gray-200">Welcome to our Electric Grid Failure Prediction project. This platform is designed to enhance the reliability and resilience of power distribution networks by proactively identifying and predicting potential points of failure. In an increasingly interconnected world, a stable and efficient electric grid is fundamental to economic activity and daily life. Our solution aims to safeguard this critical infrastructure by moving from reactive problem-solving to proactive prevention.</p>
+        <h2 class="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-white">What We Do:</h2>
+        <ul class="list-disc pl-8 mb-4 text-gray-700 dark:text-gray-200">
+            <li class="mb-2"><b>Real-time Network Topology Visualization:</b> The "Network Topology" section provides a dynamic visual representation of the grid, allowing operators to see the health status (Healthy, Warning, Critical) of different nodes and connections at a glance.</li>
+            <li class="mb-2"><b>Comprehensive Data Analysis:</b> We process diverse data inputs related to grid performance, environmental conditions, and historical events to identify patterns and anomalies that precede a failure.</li>
+            <li class="mb-2"><b>Predictive Modeling:</b> Through sophisticated algorithms, our system generates predictions on where and when potential failures might occur. This gives operators crucial lead time to intervene.</li>
+            <li class="mb-2"><b>Event Logging and Alerting:</b> The "Event Log / Alerts" section records critical events and issues real-time notifications, ensuring that operators are immediately aware of emerging threats and can take prompt action.</li>
+            <li class="mb-2"><b>Performance Monitoring & Statistics:</b> The "Controls" and "Statistics" panels offer vital information, including total nodes, healthy/warning/critical/failed counts, average load, and predicted time to failure, providing a comprehensive overview of grid health and simulation parameters.</li>
+            <li class="mb-2"><b>Simulation & Control:</b> Features like "Node Load" and "Simulation Speed" allow for testing and understanding grid behavior under various conditions, aiding in strategic planning and disaster preparedness.</li>
+        </ul>
+        <h2 class="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-white">Our Mission:</h2>
+        <p class="text-gray-700 dark:text-gray-200">Our mission is to empower grid operators with the intelligence needed to maintain uninterrupted power supply, minimize downtime, and ensure public safety. By providing predictive insights, our project contributes to building a more robust, efficient, and reliable energy future for communities. We believe that proactive management is key to navigating the complexities of modern power grids.</p>
+    </section>
+    <div id="mainContent">
+        <div class="flex h-screen">
+            <div class="w-1/4 bg-white bg-opacity-10 backdrop-blur-md rounded-lg shadow-lg p-6 space-y-6 overflow-y-auto">
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Controls</h2>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Node Load</label>
+                        <div class="flex items-center space-x-4">
+                            <input type="range" id="loadSlider" min="0" max="100" value="50" class="flex-1">
+                            <span id="loadValue" class="text-sm text-gray-600 dark:text-gray-400">50%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Simulation Speed</label>
+                        <select id="speedControl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="slow">Slow</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="fast">Fast</option>
+                        </select>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="startButton" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                            Start
+                        </button>
+                        <button id="stopButton" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors hidden">
+                            Stop
+                        </button>
+                        <button id="resetButton" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                    <button id="downloadButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        Download
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Statistics</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            <div>Total Nodes: <span id="totalNodes" class="font-medium">0</span></div>
+                            <div>Healthy: <span id="healthyNodes" class="font-medium text-green-500">0</span></div>
+                            <div>Moderate: <span id="moderateNodes" class="font-medium text-yellow-500">0</span></div>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            <div>Warning: <span id="warningNodes" class="font-medium text-orange-500">0</span></div>
+                            <div>Critical: <span id="criticalNodes" class="font-medium text-red-500">0</span></div>
+                            <div>Failed: <span id="failedNodes" class="font-medium text-red-900">0</span></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <div>Average Load: <span id="averageLoad" class="font-medium">0%</span></div>
+                        <div>Predicted Load: <span id="predictedLoad" class="font-medium">0%</span></div>
+                        <div>System Health: <span id="systemHealth" class="font-medium">100%</span></div>
+                    </div>
+                    <h3 class="text-md font-semibold text-gray-800 dark:text-white mt-4">Power Flow Metrics</h3>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                        <div>System Voltage: <span id="systemVoltage" class="font-medium">0 kV</span></div>
+                        <div>System Frequency: <span id="systemFrequency" class="font-medium">0 Hz</span></div>
+                        <div>Average Temperature: <span id="avgTemperature" class="font-medium">0°C</span></div>
+                        <div>Weather Condition: <span id="weatherCondition" class="font-medium">-</span></div>
+                        <div>Power Factor: <span id="powerFactor" class="font-medium">0.00</span></div>
+                        <div>Line Utilization: <span id="lineUtilization" class="font-medium">0%</span></div>
+                        <div>Substation Status: <span id="substationStatus" class="font-medium">Online</span></div>
+                    </div>
+                    <h3 class="text-md font-semibold text-gray-800 dark:text-white mt-4">Maintenance & Reliability</h3>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                        <div>Next Maintenance: <span id="nextMaintenance" class="font-medium">-</span></div>
+                        <div>Recent Faults: <span id="recentFaults" class="font-medium">0</span></div>
+                        <div>Load Forecast Error: <span id="loadForecastError" class="font-medium">0%</span></div>
+                        <div>Equipment Health: <span id="equipmentHealth" class="font-medium">Good</span></div>
+                        <div>Outage Duration: <span id="outageDuration" class="font-medium">0h 0m</span></div>
+                        <div>Restoration Time: <span id="restorationTime" class="font-medium">0h 0m</span></div>
+                    </div>
+                    <h3 class="text-md font-semibold text-gray-800 dark:text-white mt-4">Failure Prediction</h3>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                        <div>Time to Next Failure: <span id="timeToFailure" class="font-medium">-</span></div>
+                        <div>Critical Node ID: <span id="criticalNodeId" class="font-medium">-</span></div>
+                        <div>System Stability: <span id="systemStability" class="font-medium">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-3/4 flex flex-col">
+                <div class="flex-1 bg-white bg-opacity-10 backdrop-blur-md rounded-lg shadow-lg overflow-hidden m-4">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800">Network Topology</h2>
+                        <div class="flex items-center space-x-4 text-sm">
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                                <span class="text-gray-600">Healthy</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
+                                <span class="text-gray-600">Warning</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
+                                <span class="text-gray-600">Critical</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full h-full relative">
+                        <canvas id="gridCanvas" class="w-full h-full rounded-lg shadow" style="display:block;"></canvas>
+                    </div>
+                </div>
+                <div class="h-1/3 bg-white bg-opacity-10 backdrop-blur-md rounded-lg shadow-lg overflow-hidden m-4">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800">System Logs</h2>
+                    </div>
+                    <div id="logContainer" class="h-full overflow-y-auto p-4 space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="graph.js"></script>
+    <script src="simulation.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const settingsLink = document.querySelectorAll('.nav-link')[2];
+        const settingsSection = document.getElementById('settingsSection');
+        const mainContent = document.getElementById('mainContent');
+        settingsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            settingsSection.classList.remove('hidden');
+            mainContent.classList.add('hidden');
+            aboutSection.classList.add('hidden');
+        });
+        document.querySelectorAll('.nav-link')[0].addEventListener('click', (e) => {
+            e.preventDefault();
+            settingsSection.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+            aboutSection.classList.add('hidden');
+        });
+        const aboutLink = document.querySelectorAll('.nav-link')[3];
+        const aboutSection = document.getElementById('aboutSection');
+        aboutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            aboutSection.classList.remove('hidden');
+            mainContent.classList.add('hidden');
+            settingsSection.classList.add('hidden');
+        });
+        const saveBtn = document.getElementById('saveConfigBtn');
+        const loadBtn = document.getElementById('loadConfigBtn');
+        const configMsg = document.getElementById('configMsg');
+        saveBtn.addEventListener('click', () => {
+            const config = {
+                nodes: document.getElementById('nodesInput').value,
+                gridComplexity: document.getElementById('gridComplexity').value,
+                componentTypes: document.getElementById('componentTypes').value,
+                noiseLevel: document.getElementById('noiseLevel').value,
+                baselineValues: document.getElementById('baselineValues').value,
+                failureFrequency: document.getElementById('failureFrequency').value,
+                timeScale: document.getElementById('timeScale').value,
+                voltageMin: document.getElementById('voltageMin').value,
+                voltageMax: document.getElementById('voltageMax').value,
+                currentMax: document.getElementById('currentMax').value,
+                temperatureMax: document.getElementById('temperatureMax').value,
+                consecutiveReadings: document.getElementById('consecutiveReadings').value,
+                voltageRateLimit: document.getElementById('voltageRateLimit').value,
+                currentRateLimit: document.getElementById('currentRateLimit').value,
+                ruleCritical: document.getElementById('ruleCritical').checked,
+                ruleWarning: document.getElementById('ruleWarning').checked,
+                ruleCustom1: document.getElementById('ruleCustom1').checked,
+                predictionSensitivity: document.getElementById('predictionSensitivity').value,
+                themeSelector: document.getElementById('themeSelector').value
+            };
+            localStorage.setItem('gridConfig', JSON.stringify(config));
+            configMsg.textContent = 'Configuration saved!';
+            configMsg.classList.remove('hidden');
+            setTimeout(() => configMsg.classList.add('hidden'), 2000);
+            settingsSection.classList.add('hidden');
+            aboutSection.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        });
+        loadBtn.addEventListener('click', () => {
+            const config = JSON.parse(localStorage.getItem('gridConfig') || '{}');
+            if (!config || Object.keys(config).length === 0) {
+                configMsg.textContent = 'No configuration found!';
+                configMsg.classList.remove('hidden');
+                setTimeout(() => configMsg.classList.add('hidden'), 2000);
+                return;
+            }
+            document.getElementById('nodesInput').value = config.nodes || '';
+            document.getElementById('gridComplexity').value = config.gridComplexity || 'Simple Radial';
+            document.getElementById('componentTypes').value = config.componentTypes || 'Balanced';
+            document.getElementById('noiseLevel').value = config.noiseLevel || 0;
+            document.getElementById('baselineValues').value = config.baselineValues || '';
+            document.getElementById('failureFrequency').value = config.failureFrequency || 'Rare';
+            document.getElementById('timeScale').value = config.timeScale || 'Update every 1 second';
+            document.getElementById('voltageMin').value = config.voltageMin || '';
+            document.getElementById('voltageMax').value = config.voltageMax || '';
+            document.getElementById('currentMax').value = config.currentMax || '';
+            document.getElementById('temperatureMax').value = config.temperatureMax || '';
+            document.getElementById('consecutiveReadings').value = config.consecutiveReadings || 1;
+            document.getElementById('voltageRateLimit').value = config.voltageRateLimit || '';
+            document.getElementById('currentRateLimit').value = config.currentRateLimit || '';
+            document.getElementById('ruleCritical').checked = !!config.ruleCritical;
+            document.getElementById('ruleWarning').checked = !!config.ruleWarning;
+            document.getElementById('ruleCustom1').checked = !!config.ruleCustom1;
+            document.getElementById('predictionSensitivity').value = config.predictionSensitivity || 0;
+            document.getElementById('themeSelector').value = config.themeSelector || 'Light';
+            configMsg.textContent = 'Configuration loaded!';
+            configMsg.classList.remove('hidden');
+            setTimeout(() => configMsg.classList.add('hidden'), 2000);
+        });
+        document.getElementById('projectTitle').addEventListener('click', (e) => {
+            e.preventDefault();
+            settingsSection.classList.add('hidden');
+            aboutSection.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
